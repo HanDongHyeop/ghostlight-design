@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}img{max-width:100%}</style>
+<title>불 켜는 유령 2.5D풍 시안</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 배치: 한 줄 세로 흐름 — 요약 → 장면별 '지금/시안' 비교(탭 전환) → 구현 방법 표 → 고를 것 */
+:root{
+  --bg:#f3f1ea; --panel:#fffdf7; --fg:#2b2620; --mute:#6d655a; --line:#d9d2c3;
+  --bronze:#8a6a3c; --accent:#2f7a5b; --chip:#e9e3d3;
+  --display:"Gowun Dodum","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1d1a17; --panel:#27231f; --fg:#efe8da; --mute:#a99f8f; --line:#3d372f;
+  --bronze:#c9a36a; --accent:#7fcfa8; --chip:#332e27; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#1d1a17; --panel:#27231f; --fg:#efe8da; --mute:#a99f8f; --line:#3d372f;
+  --bronze:#c9a36a; --accent:#7fcfa8; --chip:#332e27; color-scheme:dark }
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:920px;margin:0 auto;padding-block:28px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:clamp(26px,6vw,38px)}
+h2{font-size:22px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3{font-size:18px}
+p{margin:0;max-width:38em}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--bronze);font-weight:700}
+.lead{color:var(--mute)}
+section{display:flex;flex-direction:column;gap:14px}
+ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.scene{display:flex;flex-direction:column;gap:10px}
+.frame{position:relative;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel);aspect-ratio:16/9;max-width:100%}
+.frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.tag{position:absolute;left:8px;top:8px;background:#2b2620;color:#f6efdf;font-size:12px;font-weight:700;padding:2px 9px;border-radius:3px;border:1px solid #8a6a3c}
+.sw{display:flex;gap:8px}
+.sw button{flex:1;font:inherit;font-weight:700;padding:10px 8px;border:1px solid var(--line);background:var(--chip);color:var(--fg);border-radius:6px;cursor:pointer}
+.sw button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.sw button:focus-visible{outline:2px solid var(--bronze);outline-offset:2px}
+.note{font-size:14px;color:var(--mute)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-weight:700;color:var(--bronze);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.pick{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:8px}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <div class="eyebrow">불 켜는 유령 · 그림체 변경 시안 · 2026-11-17</div>
+    <h1>입체는 남기고, 화면은 그림처럼</h1>
+    <p class="lead">보내 주신 전투 영상의 그림체를 분석해 지금 게임 화면 여섯 장면에 입혀 본 시안입니다. 각 장면에서 단추를 눌러 지금 화면과 시안을 번갈아 볼 수 있습니다.</p>
+  </header>
+
+  <section>
+    <h2>참고 영상에서 읽은 것</h2>
+    <p>영상 속 게임은 실제로는 3D입니다. 그런데 2D처럼 보이는 이유는 빛을 계산하지 않고, 명암을 그림으로 미리 칠해 두었기 때문입니다.</p>
+    <ul>
+      <li><b>모델은 단순, 표면은 손그림.</b> 각이 적은 덩어리에 그늘 · 반짝임 · 주름 선까지 텍스처에 그려 넣었습니다.</li>
+      <li><b>실시간 빛이 거의 없음.</b> 그림자는 발밑 둥근 얼룩 하나, 번짐 · 흐림 효과가 없습니다.</li>
+      <li><b>바닥은 무늬 한 장.</b> 풀포기를 하나하나 세우지 않고, 바닥 무늬로 장소를 알려 줍니다.</li>
+      <li><b>배경은 낮은 대비, 캐릭터는 높은 대비.</b> 움직이는 것만 또렷해서 눈이 어디를 볼지 헷갈리지 않습니다.</li>
+      <li><b>효과는 납작한 그림 조각.</b> 불꽃 · 번쩍임은 2D 그림을 겹쳐 띄웁니다.</li>
+    </ul>
+    <p class="note">지금 우리 화면이 어지러운 까닭도 여기서 보입니다. 흔들리는 풀 수천 포기, 떠다니는 빛 알갱이, 번짐 효과가 캐릭터와 같은 세기로 움직이고 있습니다.</p>
+  </section>
+
+  <section id="scenes">
+    <h2>장면별 시안</h2>
+  </section>
+
+  <section>
+    <h2>실제로 이렇게 만듭니다</h2>
+    <p>시안은 그림이지만, 지금 있는 3D 모델과 섬 구조를 그대로 두고 아래만 바꾸면 이 모습에 가까워집니다. 조작 · 퀘스트 · 지형은 바뀌지 않습니다.</p>
+    <div class="tbl"><table>
+      <tr><th>바꾸는 것</th><th>지금</th><th>시안</th><th>폰에서 얻는 것</th></tr>
+      <tr><td>풀</td><td>풀포기를 하나씩 세워 바람에 흔듦</td><td>바닥에 칠한 풀 무늬 + 드문드문 풀 뭉치 · 꽃</td><td>가장 큰 부하가 사라짐</td></tr>
+      <tr><td>빛</td><td>실시간 빛 · 그림자 · 번짐 · 빛 알갱이</td><td>빛 계산 없는 재질 + 발밑 둥근 그림자</td><td>화면 전체 계산이 절반 아래로</td></tr>
+      <tr><td>캐릭터</td><td>부드러운 명암</td><td>명암 2단 + 가는 테두리 선</td><td>움직여도 윤곽이 또렷</td></tr>
+      <tr><td>나무 · 바위 · 건물</td><td>매끈한 재질</td><td>같은 모델에 손그림풍 텍스처를 다시 입힘</td><td>부하는 그대로, 그림체 통일</td></tr>
+      <tr><td>먼 경치 · 하늘</td><td>3D 구름 · 안개</td><td>그림 한 장으로 된 배경</td><td>그릴 물체 수가 줆</td></tr>
+      <tr><td>효과</td><td>빛 번짐 중심</td><td>납작한 그림 조각 효과</td><td>가볍고 또렷함</td></tr>
+    </table></div>
+    <p class="note">시안 그림은 실제 결과보다 조금 더 평면 그림처럼 나왔습니다. 게임에 넣으면 카메라가 돌 때 입체감이 살아 있어, 참고 영상에 더 가까운 느낌이 됩니다. 바람에 흔들리는 풀은 풀 뭉치와 캐릭터 옷 쪽에만 남깁니다.</p>
+  </section>
+
+  <section>
+    <h2>골라 주시면 되는 것</h2>
+    <div class="pick">
+      <h3>1. 이 방향으로 갈지</h3>
+      <p>좋다면 먼저 들판 한 구역만 실제 게임에 적용해, 폰에서 돌려 볼 수 있는 판을 만들겠습니다.</p>
+    </div>
+    <div class="pick">
+      <h3>2. 테두리 선 굵기</h3>
+      <p>시안은 가는 선입니다. 더 만화처럼 굵게, 또는 선 없이 색만으로 할 수도 있습니다.</p>
+    </div>
+    <div class="pick">
+      <h3>3. 바닥 무늬의 세기</h3>
+      <p>눈의 나라 · 보석 골짜기 시안처럼 바닥 결이 뚜렷한 쪽과, 들판 시안처럼 부드러운 쪽 중 어느 쪽이 편한지 알려 주세요.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const S=[
+ ["풀빛 아침 언덕","풀포기 대신 칠한 풀밭. 꽃과 캐릭터만 또렷하게 남습니다."],
+ ["하얀 눈의 나라","흐릿한 눈 알갱이를 걷어 내고 작은 눈송이 몇 개만. 주민이 한눈에 들어옵니다."],
+ ["반짝반짝 보석 골짜기","먼지와 번짐을 빼고 바닥에 돌 무늬. 보석 나무의 색 면이 살아납니다."],
+ ["구름 하늘섬","앞을 가리던 큰 풀을 없애고 구름 바닥으로. 계단과 성이 목표로 보입니다."],
+ ["대화 장면","아직 불이 꺼진 회색 땅. 대화 창은 지금의 짙은 고동 판 그대로 둡니다."],
+ ["멀리 보기","먼 경치는 대비를 낮춘 그림 배경. 길과 숲이 지도처럼 읽힙니다."]
+];
+const host=document.getElementById('scenes');
+S.forEach((s,i)=>{
+  const n=i+1, el=document.createElement('div'); el.className='scene';
+  el.innerHTML=`<h3>${n}. ${s[0]}</h3>
+  <div class="frame"><img id="img${n}" src="img/s${n}b.jpg" alt="${s[0]} 시안"><span class="tag" id="tag${n}">시안</span></div>
+  <div class="sw"><button type="button" id="now${n}" aria-pressed="false">지금 화면</button><button type="button" id="new${n}" aria-pressed="true">시안</button></div>
+  <p class="note">${s[1]}</p>`;
+  host.appendChild(el);
+  const img=el.querySelector('img'),tag=el.querySelector('.tag'),a=el.querySelector('#now'+n),b=el.querySelector('#new'+n);
+  const set=k=>{img.src=`img/s${n}${k}.jpg`;tag.textContent=k==='a'?'지금 화면':'시안';a.setAttribute('aria-pressed',k==='a');b.setAttribute('aria-pressed',k==='b')};
+  a.onclick=()=>set('a'); b.onclick=()=>set('b');
+  new Image().src=`img/s${n}a.jpg`;
+});
+</script>
+
+</html>
